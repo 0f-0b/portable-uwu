@@ -1,0 +1,18 @@
+[package]
+name = "portable-uwu-fuzz"
+edition = "2024"
+publish = false
+
+[package.metadata]
+cargo-fuzz = true
+
+[[bin]]
+name = "uwuify"
+path = "fuzz_targets/uwuify.rs"
+test = false
+bench = false
+doc = false
+
+[dependencies]
+libfuzzer-sys = "0.4"
+portable-uwu = { path = ".." }

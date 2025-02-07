@@ -1,0 +1,18 @@
+name: CI
+on: [push, pull_request]
+permissions:
+  contents: read
+env:
+  CARGO_TERM_COLOR: always
+jobs:
+  test:
+    runs-on: [ubuntu-latest, macos-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Prepare Rust toolchain
+        run: rustup show
+      - name: Lint
+        run: cargo fmt --check && cargo clippy --workspace --locked && cargo clippy --no-default-features --locked
+      - name: Test
+        run: cargo test --locked && cargo test --no-default-features --locked
