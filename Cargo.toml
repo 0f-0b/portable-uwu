@@ -1,0 +1,17 @@
+[workspace]
+members = ["fuzz"]
+
+[package]
+name = "portable-uwu"
+edition = "2024"
+
+[dependencies]
+core_simd = { git = "https://github.com/rust-lang/portable-simd.git", rev = "3383cfbd3572465febc7a8f816a46304373de46a" }
+
+[features]
+default = ["alloc"]
+alloc = []
+
+[profile.release]
+codegen-units = 1
+lto = true
