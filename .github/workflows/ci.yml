@@ -6,7 +6,7 @@ env:
   CARGO_TERM_COLOR: always
 jobs:
   test:
-    runs-on: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.runner }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -16,3 +16,6 @@ jobs:
         run: cargo fmt --check && cargo clippy --workspace --locked && cargo clippy --no-default-features --locked
       - name: Test
         run: cargo test --locked && cargo test --no-default-features --locked
+    strategy:
+      matrix:
+        runner: [ubuntu-latest, macos-latest]
