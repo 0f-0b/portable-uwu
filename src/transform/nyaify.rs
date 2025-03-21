@@ -1,4 +1,4 @@
-use core_simd::simd::prelude::*;
+use core::simd::prelude::*;
 
 use super::super::simd::ShiftElementsDyn as _;
 use super::str::{ASCII_CASE_MASK, NEWLINE, SMALL_N, SPACE, TAB};

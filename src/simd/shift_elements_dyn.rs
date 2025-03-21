@@ -1,7 +1,6 @@
 use core::array;
-
-use core_simd::simd::prelude::*;
-use core_simd::simd::{LaneCount, SupportedLaneCount};
+use core::simd::prelude::*;
+use core::simd::{LaneCount, SupportedLaneCount};
 
 pub trait ShiftElementsDyn {
     #[must_use]

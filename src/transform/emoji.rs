@@ -1,4 +1,4 @@
-use core_simd::simd::prelude::*;
+use core::simd::prelude::*;
 
 use super::super::array::const_map;
 use super::super::simd::ShiftElementsDyn as _;

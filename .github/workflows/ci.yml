@@ -11,7 +11,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Prepare Rust toolchain
-        run: rustup show
+        run: rustup toolchain install
       - name: Lint
         run: cargo fmt --check && cargo clippy --workspace --locked && cargo clippy --no-default-features --locked
       - name: Test
