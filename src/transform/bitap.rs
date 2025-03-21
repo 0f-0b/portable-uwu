@@ -1,5 +1,5 @@
-use core_simd::simd::prelude::*;
-use core_simd::simd::{LaneCount, SupportedLaneCount};
+use core::simd::prelude::*;
+use core::simd::{LaneCount, SupportedLaneCount};
 
 use super::super::array::const_map;
 use super::str::str_to_vec;

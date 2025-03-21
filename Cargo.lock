@@ -10,19 +10,14 @@ checksum = "dde20b3d026af13f561bdd0f15edf01fc734f0dafcedbaf42bba506a9517f223"
 
 [[package]]
 name = "cc"
-version = "1.2.13"
+version = "1.2.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c7777341816418c02e033934a09f20dc0ccaf65a5201ef8a450ae0105a573fda"
+checksum = "be714c154be609ec7f5dad223a33bf1482fff90472de28f7362806e6d4832b8c"
 dependencies = [
  "jobserver",
  "libc",
  "shlex",
 ]
-
-[[package]]
-name = "core_simd"
-version = "0.1.0"
-source = "git+https://github.com/rust-lang/portable-simd.git?rev=3383cfbd3572465febc7a8f816a46304373de46a#3383cfbd3572465febc7a8f816a46304373de46a"
 
 [[package]]
 name = "jobserver"
@@ -35,9 +30,9 @@ dependencies = [
 
 [[package]]
 name = "libc"
-version = "0.2.169"
+version = "0.2.171"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b5aba8db14291edd000dfcc4d620c7ebfb122c613afb886ca8803fa4e128a20a"
+checksum = "c19937216e9d3aa9956d9bb8dfc0b0c8beb6058fc4f7a4dc4d850edf86a237d6"
 
 [[package]]
 name = "libfuzzer-sys"
@@ -52,9 +47,6 @@ dependencies = [
 [[package]]
 name = "portable-uwu"
 version = "0.0.0"
-dependencies = [
- "core_simd",
-]
 
 [[package]]
 name = "portable-uwu-fuzz"

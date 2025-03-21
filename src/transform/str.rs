@@ -1,5 +1,5 @@
-use core_simd::simd::prelude::*;
-use core_simd::simd::{LaneCount, SupportedLaneCount};
+use core::simd::prelude::*;
+use core::simd::{LaneCount, SupportedLaneCount};
 
 pub const ASCII_CASE_MASK: u8x16 = Simd::splat(1 << 5);
 pub const SMALL_A: u8x16 = Simd::splat(b'a');
