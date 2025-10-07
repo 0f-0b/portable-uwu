@@ -1,10 +1,9 @@
 #![feature(
     decl_macro,
-    doc_auto_cfg,
+    doc_cfg,
     maybe_uninit_array_assume_init,
     maybe_uninit_uninit_array_transpose,
-    portable_simd,
-    slice_as_chunks
+    portable_simd
 )]
 #![no_std]
 
