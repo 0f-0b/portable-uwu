@@ -26,7 +26,7 @@ where
     let mut i = 0;
     while i < len {
         res[i] = bytes[i];
-        i += 1
+        i += 1;
     }
     Simd::from_array(res)
 }

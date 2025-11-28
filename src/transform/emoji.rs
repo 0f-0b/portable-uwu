@@ -1,6 +1,5 @@
 use core::simd::prelude::*;
 
-use super::super::array::const_map;
 use super::super::simd::ShiftElementsDyn as _;
 use super::super::xorshift::XorShift32;
 use super::str::{COMMA, EXCLAMATION, NEWLINE, PERIOD, SPACE, TAB, str_to_vec};
@@ -41,8 +40,8 @@ const LUT: [&str; LUT_SIZE] = [
     " /(^•ω•^)",
     " (✿oωo)",
 ];
-const INSERT_VEC: [u8x16; LUT_SIZE] = const_map!(str_to_vec, LUT);
-const INSERT_LEN: [usize; LUT_SIZE] = const_map!(str::len, LUT);
+const INSERT_VEC: [u8x16; LUT_SIZE] = LUT.map(str_to_vec);
+const INSERT_LEN: [usize; LUT_SIZE] = LUT.map(str::len);
 
 pub unsafe fn emoji(
     in_bytes: &[u8],

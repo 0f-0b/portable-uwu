@@ -1,13 +1,6 @@
-#![feature(
-    decl_macro,
-    doc_cfg,
-    maybe_uninit_array_assume_init,
-    maybe_uninit_uninit_array_transpose,
-    portable_simd
-)]
+#![feature(const_array, const_trait_impl, doc_cfg, portable_simd)]
 #![no_std]
 
-mod array;
 mod simd;
 mod transform;
 mod xorshift;
@@ -42,7 +35,7 @@ pub fn uwuify_into<'a>(bytes: &[u8], temp1: &'a mut [u8], temp2: &'a mut [u8]) -
 
 #[inline(always)]
 unsafe fn pad_zeros(bytes: &mut [u8], len: usize) {
-    unsafe { bytes.get_unchecked_mut(len..len.next_multiple_of(16)) }.fill(0)
+    unsafe { bytes.get_unchecked_mut(len..len.next_multiple_of(16)) }.fill(0);
 }
 
 #[cfg(test)]
