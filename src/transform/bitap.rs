@@ -1,7 +1,6 @@
 use core::simd::prelude::*;
 use core::simd::{LaneCount, SupportedLaneCount};
 
-use super::super::array::const_map;
 use super::str::str_to_vec;
 
 const fn get_masks<const N: usize>(patterns: [&str; N]) -> [Simd<u16, N>; 256]
@@ -23,7 +22,7 @@ where
         }
         i += 1;
     }
-    const_map!(Simd::from_array, res)
+    res.map(Simd::from_array)
 }
 
 const fn get_start_mask<const N: usize>(patterns: [&str; N]) -> Simd<u16, N>
@@ -52,9 +51,9 @@ const REPLACE: [&str; 8] = [
 ];
 const START_MASK: u16x8 = get_start_mask(PATTERNS);
 const MASKS: [u16x8; 256] = get_masks(PATTERNS);
-const PATTERN_LEN: [usize; 8] = const_map!(str::len, PATTERNS);
-const REPLACE_LEN: [usize; 8] = const_map!(str::len, REPLACE);
-const REPLACE_VEC: [u8x16; 8] = const_map!(str_to_vec, REPLACE);
+const PATTERN_LEN: [usize; 8] = PATTERNS.map(str::len);
+const REPLACE_LEN: [usize; 8] = REPLACE.map(str::len);
+const REPLACE_VEC: [u8x16; 8] = REPLACE.map(str_to_vec);
 
 #[derive(Debug, PartialEq, Eq)]
 struct Match {
