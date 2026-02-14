@@ -1,5 +1,4 @@
 use core::simd::prelude::*;
-use core::simd::{LaneCount, SupportedLaneCount};
 
 pub const ASCII_CASE_MASK: u8x16 = Simd::splat(1 << 5);
 pub const SMALL_A: u8x16 = Simd::splat(b'a');
@@ -15,10 +14,7 @@ pub const SPACE: u8x16 = Simd::splat(b' ');
 pub const TAB: u8x16 = Simd::splat(b'\t');
 pub const NEWLINE: u8x16 = Simd::splat(b'\n');
 
-pub const fn str_to_vec<const MAX_LEN: usize>(s: &str) -> Simd<u8, MAX_LEN>
-where
-    LaneCount<MAX_LEN>: SupportedLaneCount,
-{
+pub const fn str_to_vec<const MAX_LEN: usize>(s: &str) -> Simd<u8, MAX_LEN> {
     let bytes = s.as_bytes();
     let len = bytes.len();
     assert!(len <= MAX_LEN);

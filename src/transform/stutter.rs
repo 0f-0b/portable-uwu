@@ -1,3 +1,4 @@
+use core::simd::Select as _;
 use core::simd::prelude::*;
 
 use super::super::simd::ShiftElementsDyn as _;

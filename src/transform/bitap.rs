@@ -1,12 +1,8 @@
 use core::simd::prelude::*;
-use core::simd::{LaneCount, SupportedLaneCount};
 
 use super::str::str_to_vec;
 
-const fn get_masks<const N: usize>(patterns: [&str; N]) -> [Simd<u16, N>; 256]
-where
-    LaneCount<N>: SupportedLaneCount,
-{
+const fn get_masks<const N: usize>(patterns: [&str; N]) -> [Simd<u16, N>; 256] {
     let mut res = [[0; N]; 256];
     let mut i = 0;
     while i < N {
@@ -25,10 +21,7 @@ where
     res.map(Simd::from_array)
 }
 
-const fn get_start_mask<const N: usize>(patterns: [&str; N]) -> Simd<u16, N>
-where
-    LaneCount<N>: SupportedLaneCount,
-{
+const fn get_start_mask<const N: usize>(patterns: [&str; N]) -> Simd<u16, N> {
     const MAX_LEN: usize = u16::BITS as usize;
     let mut res = [0; N];
     let mut i = 0;

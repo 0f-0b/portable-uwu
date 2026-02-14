@@ -1,6 +1,5 @@
 use core::array;
 use core::simd::prelude::*;
-use core::simd::{LaneCount, SupportedLaneCount};
 
 pub trait ShiftElementsDyn {
     #[must_use]
@@ -11,10 +10,7 @@ pub trait ShiftElementsDyn {
     fn shift_elements_right_dyn(self, count: usize) -> Self;
 }
 
-impl<const N: usize> ShiftElementsDyn for Simd<u8, N>
-where
-    LaneCount<N>: SupportedLaneCount,
-{
+impl<const N: usize> ShiftElementsDyn for Simd<u8, N> {
     #[inline]
     fn shift_elements_left_dyn(self, count: usize) -> Self {
         let indices = Simd::from_array(array::from_fn(|x| x as u8));
