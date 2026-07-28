@@ -1,3 +1,4 @@
+use core::mem::MaybeUninit;
 use core::simd::prelude::*;
 
 use super::super::simd::ShiftElementsDyn as _;
@@ -46,16 +47,14 @@ const INSERT_LEN: [usize; LUT_SIZE] = LUT.map(str::len);
 pub unsafe fn emoji(
     in_bytes: &[u8],
     mut len: usize,
-    mut out_bytes: &mut [u8],
+    out_bytes: &mut [MaybeUninit<u8>],
     rng: &mut XorShift32,
 ) -> usize {
+    let mut out_ptr = out_bytes.as_mut_ptr();
     unsafe {
-        for vec in in_bytes
-            .get_unchecked(..len.next_multiple_of(16))
-            .as_chunks_unchecked::<16>()
-        {
+        for vec in in_bytes.as_chunks_unchecked::<16>() {
             let vec = u8x16::from_slice(vec);
-            vec.copy_to_slice(out_bytes.get_unchecked_mut(..16));
+            out_ptr.cast::<u8x16>().write_unaligned(vec);
             let punctuation_mask =
                 vec.simd_eq(COMMA) | vec.simd_eq(PERIOD) | vec.simd_eq(EXCLAMATION);
             let space_mask = vec.simd_eq(SPACE) | vec.simd_eq(TAB) | vec.simd_eq(NEWLINE);
@@ -67,13 +66,19 @@ pub unsafe fn emoji(
                 let rand_index = rng.gen_bits(LUT_BITS) as usize;
                 let insert = INSERT_VEC[rand_index];
                 let insert_len = INSERT_LEN[rand_index];
-                insert.copy_to_slice(out_bytes.get_unchecked_mut(insert_index..insert_index + 16));
-                out_bytes = out_bytes.get_unchecked_mut(insert_len..);
+                out_ptr
+                    .add(insert_index)
+                    .cast::<u8x16>()
+                    .write_unaligned(insert);
+                out_ptr = out_ptr.add(insert_len);
                 len += insert_len;
                 let rest = vec.shift_elements_right_dyn(insert_index);
-                rest.copy_to_slice(out_bytes.get_unchecked_mut(insert_index..insert_index + 16));
+                out_ptr
+                    .add(insert_index)
+                    .cast::<u8x16>()
+                    .write_unaligned(rest);
             }
-            out_bytes = out_bytes.get_unchecked_mut(16..);
+            out_ptr = out_ptr.add(16);
         }
     }
     len

@@ -7,7 +7,7 @@ impl XorShift32 {
     #[inline(always)]
     pub fn new(seed: [u8; 4]) -> Self {
         let state = u32::from_le_bytes(seed);
-        XorShift32 {
+        Self {
             state: state | 1,
             counter: state,
         }

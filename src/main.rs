@@ -19,12 +19,12 @@ fn main() -> io::Result<()> {
     const CHUNK_SIZE: usize = 0x10000;
     let mut input = io::stdin().lock();
     let mut output = io::stdout().lock();
-    let mut buf = vec![0; CHUNK_SIZE];
-    let mut temp1 = vec![0; CHUNK_SIZE * 4 + 24];
-    let mut temp2 = vec![0; CHUNK_SIZE * 4 + 24];
-    while let n @ 1.. = read_as_much_as_possible(&mut input, &mut buf)? {
-        output.write_all(uwuify_into(&buf[..n], &mut temp1, &mut temp2))?;
-        if n < buf.len() {
+    let mut in_buf = vec![0; CHUNK_SIZE];
+    let mut out_buf = Box::new_uninit_slice(CHUNK_SIZE * 4 + 24);
+    let mut aux_buf = Box::new_uninit_slice(CHUNK_SIZE * 2 + 15);
+    while let n @ 1.. = read_as_much_as_possible(&mut input, &mut in_buf)? {
+        output.write_all(uwuify_into(&in_buf[..n], &mut out_buf, &mut aux_buf))?;
+        if n < in_buf.len() {
             break;
         }
     }

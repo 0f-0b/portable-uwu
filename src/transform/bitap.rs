@@ -1,3 +1,4 @@
+use core::mem::MaybeUninit;
 use core::simd::prelude::*;
 
 use super::str::str_to_vec;
@@ -80,13 +81,13 @@ impl Bitap8x16 {
     }
 }
 
-pub unsafe fn bitap(in_bytes: &[u8], out_bytes: &mut [u8]) -> usize {
+pub unsafe fn bitap(in_bytes: &[u8], out_bytes: &mut [MaybeUninit<u8>]) -> usize {
     let mut len = in_bytes.len();
     let mut out_ptr = out_bytes.as_mut_ptr();
     let mut bitap = Bitap8x16::new();
     unsafe {
         for &c in in_bytes {
-            *out_ptr = c;
+            out_ptr.cast::<u8>().write(c);
             out_ptr = out_ptr.add(1);
             if let Some(m) = bitap.next(c) {
                 out_ptr = out_ptr.sub(m.match_len);

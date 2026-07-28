@@ -5,6 +5,8 @@ mod simd;
 mod transform;
 mod xorshift;
 
+use core::mem::MaybeUninit;
+
 use transform::{bitap, emoji, nyaify, stutter};
 use xorshift::XorShift32;
 
@@ -13,75 +15,94 @@ mod alloc;
 #[cfg(feature = "alloc")]
 pub use alloc::*;
 
-/// uwuifies some bytes into the provided buffers. non-ascii bytes are unchanged.
+/// uwuifies some bytes, storing output into the provided buffers. non-ascii bytes are unchanged.
 ///
-/// this function panics if the buffers are not large enough. both buffers must be at least
-/// `bytes.len() * 4 + 24` bytes long.
-pub fn uwuify_into<'a>(bytes: &[u8], temp1: &'a mut [u8], temp2: &'a mut [u8]) -> &'a [u8] {
-    assert!(temp1.len() >= bytes.len() * 4 + 24);
-    assert!(temp2.len() >= bytes.len() * 4 + 24);
+/// the returned slice is a fully-initialized prefix of `out_buf`. `aux_buf` is left uninitialized.
+///
+/// # Panics
+///
+/// this function panics if the buffers are not large enough.
+///
+/// - `out_buf` must be at least `bytes.len() * 4 + 24` bytes long.
+/// - `aux_buf` must be at least `bytes.len() * 2 + 15` bytes long.
+///
+/// # Example
+///
+/// ```
+/// use portable_uwu::uwuify_into;
+///
+/// let bytes = "Hey, I think I really love you. Do you want a headpat?".as_bytes();
+///
+/// let mut out_buf = Box::new_uninit_slice(bytes.len() * 4 + 24);
+/// let mut aux_buf = Box::new_uninit_slice(bytes.len() * 2 + 15);
+/// let result = uwuify_into(bytes, &mut out_buf, &mut aux_buf);
+/// drop(aux_buf);
+///
+/// assert_eq!(
+///     result,
+///     "hey, (ꈍᴗꈍ) i think i weawwy wuv you. ^•ﻌ•^ do y-you want a headpat?".as_bytes(),
+/// );
+/// ```
+pub fn uwuify_into<'a>(
+    bytes: &[u8],
+    out_buf: &'a mut [MaybeUninit<u8>],
+    aux_buf: &mut [MaybeUninit<u8>],
+) -> &'a [u8] {
+    assert!(bytes.len() <= (usize::MAX - 24) / 4);
+    assert!(out_buf.len() >= bytes.len() * 4 + 24);
+    assert!(aux_buf.len() >= bytes.len() * 2 + 15);
     let mut rng = XorShift32::new(*b"uwu!");
     unsafe {
-        let len = bitap(bytes, temp1);
-        pad_zeros(temp1, len);
-        let len = nyaify(temp1, len, temp2);
-        pad_zeros(temp2, len);
-        let len = stutter(temp2, len, temp1, &mut rng);
-        pad_zeros(temp1, len);
-        let len = emoji(temp1, len, temp2, &mut rng);
-        temp2.get_unchecked(..len)
+        let len = bitap(bytes, aux_buf);
+        let len = nyaify(pad_zeros(aux_buf, len), len, out_buf);
+        let len = stutter(pad_zeros(out_buf, len), len, aux_buf, &mut rng);
+        let len = emoji(pad_zeros(aux_buf, len), len, out_buf, &mut rng);
+        out_buf.get_unchecked(..len).assume_init_ref()
     }
 }
 
 #[inline(always)]
-unsafe fn pad_zeros(bytes: &mut [u8], len: usize) {
-    unsafe { bytes.get_unchecked_mut(len..len.next_multiple_of(16)) }.fill(0);
+unsafe fn pad_zeros(bytes: &mut [MaybeUninit<u8>], len: usize) -> &[u8] {
+    unsafe {
+        bytes
+            .get_unchecked_mut(len..len.next_multiple_of(16))
+            .fill(MaybeUninit::new(0));
+        bytes
+            .get_unchecked(..len.next_multiple_of(16))
+            .assume_init_ref()
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    const CASES: &[(&str, &str)] = &[
-        (
-            "Hey, I think I really love you. Do you want a headpat?",
-            "hey, (ꈍᴗꈍ) i think i weawwy wuv you. ^•ﻌ•^ do y-you want a headpat?",
-        ),
-        (
-            include_str!("../testdata/input.txt"),
-            include_str!("../testdata/output.txt"),
-        ),
-    ];
+    const INPUT: &str = include_str!("../testdata/input.txt");
+    const EXPECTED: &str = include_str!("../testdata/output.txt");
 
     #[cfg(feature = "alloc")]
     #[test]
     fn uwuify_works() {
-        for &(input, expected) in CASES {
-            let actual = uwuify(input);
-            assert_eq!(actual, expected);
-        }
+        let actual = uwuify(INPUT);
+        assert_eq!(actual, EXPECTED);
     }
 
     #[cfg(feature = "alloc")]
     #[test]
     fn uwuify_bytes_works() {
-        for &(input, expected) in CASES {
-            let actual = uwuify_bytes(input.as_bytes());
-            assert_eq!(actual, expected.as_bytes());
-        }
+        let actual = uwuify_bytes(INPUT.as_bytes());
+        assert_eq!(actual, EXPECTED.as_bytes());
     }
 
     #[test]
     fn uwuify_into_works() {
         extern crate alloc;
-        use alloc::vec;
+        use alloc::boxed::Box;
 
-        for &(input, expected) in CASES {
-            let bytes = input.as_bytes();
-            let mut temp1 = vec![0; bytes.len() * 4 + 24];
-            let mut temp2 = vec![0; bytes.len() * 4 + 24];
-            let actual = uwuify_into(bytes, &mut temp1, &mut temp2);
-            assert_eq!(actual, expected.as_bytes());
-        }
+        let bytes = INPUT.as_bytes();
+        let mut out_buf = Box::new_uninit_slice(bytes.len() * 4 + 24);
+        let mut aux_buf = Box::new_uninit_slice(bytes.len() * 2 + 15);
+        let actual = uwuify_into(bytes, &mut out_buf, &mut aux_buf);
+        assert_eq!(actual, EXPECTED.as_bytes());
     }
 }
