@@ -64,6 +64,10 @@ pub unsafe fn emoji(
             if insert_mask != 0 {
                 let insert_index = insert_mask.trailing_zeros() as usize + 1;
                 let rand_index = rng.gen_bits(LUT_BITS) as usize;
+                #[cfg(fuzzing)]
+                let _ = rand_index;
+                #[cfg(fuzzing)]
+                let rand_index = 14usize;
                 let insert = INSERT_VEC[rand_index];
                 let insert_len = INSERT_LEN[rand_index];
                 out_ptr

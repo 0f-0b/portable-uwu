@@ -29,6 +29,10 @@ pub unsafe fn stutter(
                 let stutter_index = stutter_mask.trailing_zeros() as usize;
                 out_ptr.add(stutter_index + 1).cast::<u8>().write(b'-');
                 let increment = rng.gen_bits(1) as usize * 2;
+                #[cfg(fuzzing)]
+                let _ = increment;
+                #[cfg(fuzzing)]
+                let increment = 2usize;
                 out_ptr = out_ptr.add(increment);
                 len += increment;
                 let rest = replaced.shift_elements_right_dyn(stutter_index);

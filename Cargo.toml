@@ -9,6 +9,9 @@ edition = "2024"
 default = ["alloc"]
 alloc = []
 
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(fuzzing)'] }
+
 [profile.release]
 codegen-units = 1
 lto = true
